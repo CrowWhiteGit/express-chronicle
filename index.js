@@ -1,4 +1,4 @@
 
-const Chronicle = require('./classes/Chronicle');
+const Chronicle = require('./build');
 
 module.exports = { Chronicle };

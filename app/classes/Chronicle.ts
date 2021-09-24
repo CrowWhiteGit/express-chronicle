@@ -1,18 +1,28 @@
 
-const Flash = require('./Flash');
-const HistoryQ = require('./HistoryQ');
+import Flash from "./Flash";
+import HistoryQ from "./HistoryQ";
 
-class Chronicle {
-    constructor(expressApp, config = {}) {
+import IConfig from "../structs/IConfig";
+import IApplication from "../structs/IApplication";
+import IRequest from "../structs/IRequest";
+import IResponse from "../structs/IResponse";
+import INextFunction from "../structs/INextFunction";
+
+import { DEFAULT_CAPACITY, DEFAULT_ENDPOINT } from "../constanst";
+
+export default class Chronicle {
+    private config: IConfig;
+    private historyQ: HistoryQ;
+
+    constructor(expressApp: IApplication, config: IConfig = {}) {
         this.config = config;
-        this.historyQ = new HistoryQ(config.capacity || 100);
+        this.historyQ = new HistoryQ(this.config.capacity || DEFAULT_CAPACITY);
         expressApp.use(this.middleware);
-        expressApp.get('/chronicle', this.endpoint);
+        expressApp.get(config.endpoint || DEFAULT_ENDPOINT, this.endpoint);
     }
 
-    /** @private */
-    middleware = (req, res, next) => {
-        req.flash = new Flash(this.config.onFinish || onFinishDefault, this.historyQ);
+    private middleware = (req: IRequest, res: IResponse, next: INextFunction) => {
+        req.flash = new Flash(this.historyQ);
 
         req.flash.setReq('method', req.method);
         req.flash.setReq('url', req.path);
@@ -20,9 +30,10 @@ class Chronicle {
         req.flash.setReq('body', req.body || {});
 
         let _json = res.json;
-        res.json = (body) => {
+        res.json = (body: any) => {
             req.flash.setRes('body', body);
             _json.call(res, body);
+            return res;
         }
         res.on('finish', () => {
             req.flash.setRes('status', {
@@ -35,8 +46,7 @@ class Chronicle {
         next();
     }
 
-    /** @private */
-    endpoint = (req, res) => {
+    private endpoint = (req: any, res: IResponse) => {
         const { limit, offset } = req.query;
         let history = this.historyQ.get(limit, offset);
         let rendered = history.map(el => {
@@ -45,10 +55,6 @@ class Chronicle {
         let html = rootPageTemplate.replace('{root}', rendered.reverse().join(''));
         res.send(html);
     }
-}
-
-function onFinishDefault(data) {
-    return data;
 }
 
 //TODO
@@ -113,5 +119,3 @@ const rootPageTemplate = `<!DOCTYPE html>
     </div>
 </body>
 </html>`
-
-module.exports = Chronicle;
