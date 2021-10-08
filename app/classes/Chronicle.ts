@@ -1,4 +1,7 @@
 
+import express from "express";
+import path from "path";
+
 import Flash from "./Flash";
 import HistoryQ from "./HistoryQ";
 
@@ -7,6 +10,8 @@ import IApplication from "../structs/IApplication";
 import IRequest from "../structs/IRequest";
 import IResponse from "../structs/IResponse";
 import INextFunction from "../structs/INextFunction";
+
+// import { PageList } from "../ui/pages";
 
 import { DEFAULT_CAPACITY, DEFAULT_ENDPOINT } from "../constanst";
 
@@ -18,10 +23,20 @@ export default class Chronicle {
         this.config = config;
         this.historyQ = new HistoryQ(this.config.capacity || DEFAULT_CAPACITY);
         expressApp.use(this.middleware);
-        expressApp.get(config.endpoint || DEFAULT_ENDPOINT, this.endpoint);
+        expressApp.use(config.endpoint || DEFAULT_ENDPOINT, express.static(path.join(__dirname, '..', 'ui')));
+        expressApp.get(`${config.endpoint || DEFAULT_ENDPOINT}/api/history`, this.getIndexPage);
+        console.log(path.join(__dirname, '..', 'ui', 'static'))
     }
 
     private middleware = (req: IRequest, res: IResponse, next: INextFunction) => {
+
+        let excludeEp = this.config.endpoint || DEFAULT_ENDPOINT;
+        // console.log(req.path, excludeEp, req.path.indexOf(excludeEp))
+        if(req.path.indexOf(excludeEp) !== -1) {
+            next();
+            return;
+        }
+
         req.flash = new Flash(this.historyQ);
 
         req.flash.setReq('method', req.method);
@@ -46,76 +61,20 @@ export default class Chronicle {
         next();
     }
 
-    private endpoint = (req: any, res: IResponse) => {
+    private getIndexPage = (req: any, res: IResponse) => {
         const { limit, offset } = req.query;
         let history = this.historyQ.get(limit, offset);
-        let rendered = history.map(el => {
-            return render(el);
-        })
-        let html = rootPageTemplate.replace('{root}', rendered.reverse().join(''));
-        res.send(html);
+        res.json(history);
     }
+
+    // private endpoint = (req: any, res: IResponse) => {
+    //     const { limit, offset } = req.query;
+    //     let history = this.historyQ.get(limit, offset);
+    //     let rendered = PageList({ items: history });
+    //     // let rendered = history.map(el => {
+    //     //     return render(el);
+    //     // })
+    //     let html = rootPageTemplate.replace('{root}', rendered);
+    //     res.send(html);
+    // }
 }
-
-//TODO
-function render(obj) {
-    return (`
-        <div style="${styleColumn}">
-            <div style="${styleRow}">
-                <span>${obj.request.method} ${obj.request.url}</span>
-                <span>${obj.response.status.code}</span>
-            </div>
-            <div style="${styleRow}">
-                <span>${(new Date(obj.timestamp)).toLocaleString()}</span>
-            </div>
-            <div style="${styleRow}">
-                <span>${obj.elapsed} ms</span>
-            </div>
-        </div>
-    `);
-}
-
-const styleBody = `
-    margin: 0; 
-    padding: 0; 
-`;
-
-const styleRoot = `
-    height: 100%;
-    display: flex; 
-    flex-wrap: wrap;
-    padding: 20px 15%;
-    background-color: aliceblue;
-    justify-content: center;
-`;
-
-const styleColumn = `
-    display: flex;
-    flex-direction: column;
-    margin: 10px;
-    padding: 10px;
-    width: 180px;
-    height: 60px;
-    background-color: white;
-`;
-
-const styleRow = `
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-`;
-
-const rootPageTemplate = `<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chronicle</title>
-</head>
-<body style="${styleBody}">
-    <div style="${styleRoot}">
-        {root}
-    </div>
-</body>
-</html>`

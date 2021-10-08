@@ -1,0 +1,18 @@
+
+.HistoryItem {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 220px;
+    height: 80px;
+    background-color: white;
+    margin: 9px;
+    padding: 9px;
+    cursor: pointer;
+}
+
+.HistoryRow {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
