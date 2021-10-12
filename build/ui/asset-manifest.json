@@ -1,8 +1,8 @@
 {
   "files": {
-    "main.css": "/chronicle/static/css/main.2bc3e8d8.chunk.css",
-    "main.js": "/chronicle/static/js/main.a73691b2.chunk.js",
-    "main.js.map": "/chronicle/static/js/main.a73691b2.chunk.js.map",
+    "main.css": "/chronicle/static/css/main.6d492be4.chunk.css",
+    "main.js": "/chronicle/static/js/main.1eab79e5.chunk.js",
+    "main.js.map": "/chronicle/static/js/main.1eab79e5.chunk.js.map",
     "runtime-main.js": "/chronicle/static/js/runtime-main.be2bfe57.js",
     "runtime-main.js.map": "/chronicle/static/js/runtime-main.be2bfe57.js.map",
     "static/js/2.b2004ed0.chunk.js": "/chronicle/static/js/2.b2004ed0.chunk.js",
@@ -10,13 +10,13 @@
     "static/js/3.a02d5a57.chunk.js": "/chronicle/static/js/3.a02d5a57.chunk.js",
     "static/js/3.a02d5a57.chunk.js.map": "/chronicle/static/js/3.a02d5a57.chunk.js.map",
     "index.html": "/chronicle/index.html",
-    "static/css/main.2bc3e8d8.chunk.css.map": "/chronicle/static/css/main.2bc3e8d8.chunk.css.map",
+    "static/css/main.6d492be4.chunk.css.map": "/chronicle/static/css/main.6d492be4.chunk.css.map",
     "static/js/2.b2004ed0.chunk.js.LICENSE.txt": "/chronicle/static/js/2.b2004ed0.chunk.js.LICENSE.txt"
   },
   "entrypoints": [
     "static/js/runtime-main.be2bfe57.js",
     "static/js/2.b2004ed0.chunk.js",
-    "static/css/main.2bc3e8d8.chunk.css",
-    "static/js/main.a73691b2.chunk.js"
+    "static/css/main.6d492be4.chunk.css",
+    "static/js/main.1eab79e5.chunk.js"
   ]
 }

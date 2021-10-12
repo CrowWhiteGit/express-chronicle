@@ -25,14 +25,13 @@ export default class Chronicle {
         expressApp.use(this.middleware);
         expressApp.use(config.endpoint || DEFAULT_ENDPOINT, express.static(path.join(__dirname, '..', 'ui')));
         expressApp.get(`${config.endpoint || DEFAULT_ENDPOINT}/api/history`, this.getIndexPage);
-        console.log(path.join(__dirname, '..', 'ui', 'static'))
     }
 
     private middleware = (req: IRequest, res: IResponse, next: INextFunction) => {
 
         let excludeEp = this.config.endpoint || DEFAULT_ENDPOINT;
         // console.log(req.path, excludeEp, req.path.indexOf(excludeEp))
-        if(req.path.indexOf(excludeEp) !== -1) {
+        if (req.path.indexOf(excludeEp) !== -1) {
             next();
             return;
         }
@@ -44,17 +43,32 @@ export default class Chronicle {
         req.flash.setReq('query', req.query || {});
         req.flash.setReq('body', req.body || {});
 
-        let _json = res.json;
-        res.json = (body: any) => {
-            req.flash.setRes('body', body);
-            _json.call(res, body);
-            return res;
-        }
+        let _write = res.write;
+        let _end = res.end;
+        let chunks = [];
+
+        res.write = function (chunk: any) {
+            chunks.push(chunk);
+            return _write.apply(res, arguments);
+        };
+        res.end = function (chunk: any) {
+            if (chunk) chunks.push(chunk);
+            if (chunk instanceof Buffer || chunk instanceof Uint8Array) {
+                res.body = Buffer.concat(chunks).toString('utf8');
+            }
+            else {
+                res.body = chunks.join('');
+            }
+            _end.apply(res, arguments);
+        };
+
         res.on('finish', () => {
             req.flash.setRes('status', {
                 code: res.statusCode,
                 message: res.statusMessage
             });
+            req.flash.setRes('body', res.body);
+            req.flash.setRes('headers', { ...res.getHeaders() });
 
             req.flash.done();
         });

@@ -23,17 +23,31 @@ class Chronicle {
             req.flash.setReq('url', req.path);
             req.flash.setReq('query', req.query || {});
             req.flash.setReq('body', req.body || {});
-            let _json = res.json;
-            res.json = (body) => {
-                req.flash.setRes('body', body);
-                _json.call(res, body);
-                return res;
+            let _write = res.write;
+            let _end = res.end;
+            let chunks = [];
+            res.write = function (chunk) {
+                chunks.push(chunk);
+                return _write.apply(res, arguments);
+            };
+            res.end = function (chunk) {
+                if (chunk)
+                    chunks.push(chunk);
+                if (chunk instanceof Buffer || chunk instanceof Uint8Array) {
+                    res.body = Buffer.concat(chunks).toString('utf8');
+                }
+                else {
+                    res.body = chunks.join('');
+                }
+                _end.apply(res, arguments);
             };
             res.on('finish', () => {
                 req.flash.setRes('status', {
                     code: res.statusCode,
                     message: res.statusMessage
                 });
+                req.flash.setRes('body', res.body);
+                req.flash.setRes('headers', Object.assign({}, res.getHeaders()));
                 req.flash.done();
             });
             next();
@@ -48,7 +62,6 @@ class Chronicle {
         expressApp.use(this.middleware);
         expressApp.use(config.endpoint || constanst_1.DEFAULT_ENDPOINT, express_1.default.static(path_1.default.join(__dirname, '..', 'ui')));
         expressApp.get(`${config.endpoint || constanst_1.DEFAULT_ENDPOINT}/api/history`, this.getIndexPage);
-        console.log(path_1.default.join(__dirname, '..', 'ui', 'static'));
     }
 }
 exports.default = Chronicle;

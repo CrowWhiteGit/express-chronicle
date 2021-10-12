@@ -3,9 +3,9 @@ import './Modal.css'
 
 export default function Modal(props) {
     return (
-        <div className="ModalBG">
+        <div className="Modal">
+            <div className="ModalBG" onClick={props.onClick}></div>
             <div className="ModalContainer">
-                <button onClick={props.onClick}>X</button>
                 <p>Time: {(new Date(props.timestamp)).toLocaleString()}</p>
                 <p>Elapsed: {props.elapsed}ms</p>
                 <p>Request:</p>
@@ -18,6 +18,7 @@ export default function Modal(props) {
                 <span>Response:</span>
                 <div className="Box">
                     <p>Status: {props.response.status.code} {props.response.status.message}</p>
+                    <p>Headers: <pre>{JSON.stringify(props.response.headers)}</pre></p>
                     <p>Body: <pre>{JSON.stringify(props.response.body)}</pre></p>
                 </div>
             </div>
