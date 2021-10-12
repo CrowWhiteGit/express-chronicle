@@ -4,9 +4,9 @@ class HistoryQ {
     constructor(capacity) {
         this.write = (item) => {
             if (this.items.length >= this.capacity) {
-                this.items.shift();
+                this.items.pop();
             }
-            this.items.push(item);
+            this.items.unshift(item);
         };
         this.get = (limit = null, offset = 0) => {
             let output = JSON.parse(JSON.stringify(this.items));

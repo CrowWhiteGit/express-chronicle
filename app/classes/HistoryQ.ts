@@ -12,9 +12,9 @@ export default class HistoryQ {
 
     write = (item: IHistoryItem) => {
         if (this.items.length >= this.capacity) {
-            this.items.shift();
+            this.items.pop();
         }
-        this.items.push(item);
+        this.items.unshift(item);
     }
 
     get = (limit: number = null, offset: number = 0) => {
