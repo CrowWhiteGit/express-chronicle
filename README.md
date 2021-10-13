@@ -83,5 +83,9 @@ IRuleException interface:
 | behavior | *Required*. Type: String, "important" / "common" / "ignore". Response status action. |
 
 # TODO
-1) Different storage engines
-2) Normal docs
+1) Different storing engines;
+2) Pagination;
+3) Config directory and environments;
+4) Possibility to set a password on UI;
+5) Methods to set extra data like db queries into flash;
+6) Exceptions for elapsed time;
