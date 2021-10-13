@@ -6,7 +6,7 @@ Inspired by Silk. This is a module for express.js for logging request-response h
 Can be configured to log or ignore specific endpoints, separate critycal responses from expected.
 
 Install with:
-`npm i --save CrowWhiteGit/express-chronicle@1.0.1`
+`npm i --save CrowWhiteGit/express-chronicle#1.0.1`
 
 Example:
 ```javacsript
