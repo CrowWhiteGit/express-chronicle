@@ -3,7 +3,7 @@
 Status: Work in progress
 
 Inspired by Silk. This is a module for express.js for logging request-response history and showing it in web interface.
-Can be configured to log or ignore specific endpoints, separate critycal responses from expected.
+Can be configured to log or ignore specific endpoints, separate critical responses from expected.
 
 Install with:
 `npm i --save CrowWhiteGit/express-chronicle#1.0.1`
