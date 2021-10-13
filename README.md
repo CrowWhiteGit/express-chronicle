@@ -21,4 +21,5 @@ app.listen(3000);
 2) Open ```/chronicle``` in browser
 
 # TODO
-1) Request logging rules
+1) Different storage engines
+2) Normal docs
