@@ -89,3 +89,4 @@ IRuleException interface:
 4) Possibility to set a password on UI;
 5) Methods to set extra data like db queries into flash;
 6) Exceptions for elapsed time;
+7) UI different cards for request methods and statuses, add filters
