@@ -7,15 +7,13 @@ import "./History.css"
 
 async function getHistory() {
     let currentUrl = document.location.href;
-    console.log('currentUrl', currentUrl)
 
-    let res = await fetch(`${currentUrl}api/history`);
-    // let res = await fetch(`http://localhost:3001/chronicle/api/history`);
+    let res = await fetch(`${currentUrl}api/important`);
     let data = await res.json()
     return data;
 }
 
-export default function History() {
+export default function Important() {
     const [history, setHistory] = useState([]);
     const [modalID, setModalID] = useState(null);
 

@@ -10,10 +10,14 @@ import IApplication from "../structs/IApplication";
 import IRequest from "../structs/IRequest";
 import IResponse from "../structs/IResponse";
 import INextFunction from "../structs/INextFunction";
+import IRuleset from "../structs/IRuleset";
 
-// import { PageList } from "../ui/pages";
-
-import { DEFAULT_CAPACITY, DEFAULT_ENDPOINT } from "../constanst";
+import {
+    DEFAULT_CAPACITY,
+    DEFAULT_IMPORTANT_CAPACITY,
+    DEFAULT_ENDPOINT,
+    DEFAULT_RULESET
+} from "../constanst";
 
 export default class Chronicle {
     private config: IConfig;
@@ -21,22 +25,36 @@ export default class Chronicle {
 
     constructor(expressApp: IApplication, config: IConfig = {}) {
         this.config = config;
-        this.historyQ = new HistoryQ(this.config.capacity || DEFAULT_CAPACITY);
+        this.historyQ = new HistoryQ(
+            this.config.capacity || DEFAULT_CAPACITY,
+            this.config.importantCapacity || DEFAULT_IMPORTANT_CAPACITY
+        );
         expressApp.use(this.middleware);
         expressApp.use(config.endpoint || DEFAULT_ENDPOINT, express.static(path.join(__dirname, '..', 'ui')));
-        expressApp.get(`${config.endpoint || DEFAULT_ENDPOINT}/api/history`, this.getIndexPage);
+        expressApp.get(`${config.endpoint || DEFAULT_ENDPOINT}/api/history`, this.getHistory);
+        expressApp.get(`${config.endpoint || DEFAULT_ENDPOINT}/api/important`, this.getImportant);
     }
 
     private middleware = (req: IRequest, res: IResponse, next: INextFunction) => {
 
         let excludeEp = this.config.endpoint || DEFAULT_ENDPOINT;
-        // console.log(req.path, excludeEp, req.path.indexOf(excludeEp))
         if (req.path.indexOf(excludeEp) !== -1) {
             next();
             return;
         }
 
-        req.flash = new Flash(this.historyQ);
+        const { defaultRuleset = DEFAULT_RULESET, rules = [] } = this.config;
+
+        let usingRuleset = Object.assign({}, defaultRuleset as IRuleset);
+        for (let rule of rules) {
+            let location = rule.location || '/'
+            if (req.path.indexOf(location) !== -1) {
+                usingRuleset = Object.assign({}, rule);
+                break;
+            }
+        }
+
+        req.flash = new Flash(this.historyQ, usingRuleset);
 
         req.flash.setReq('method', req.method);
         req.flash.setReq('url', req.path);
@@ -75,9 +93,14 @@ export default class Chronicle {
         next();
     }
 
-    private getIndexPage = (req: any, res: IResponse) => {
+    private getHistory = (req: any, res: IResponse) => {
         const { limit, offset } = req.query;
         let history = this.historyQ.get(limit, offset);
+        res.json(history);
+    }
+    private getImportant = (req: any, res: IResponse) => {
+        const { limit, offset } = req.query;
+        let history = this.historyQ.getImportant(limit, offset);
         res.json(history);
     }
 

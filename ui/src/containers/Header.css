@@ -1,0 +1,17 @@
+
+.Header {
+    height: 60px;
+    width: 100%;
+    position: absolute;
+    border-bottom: 3px #FFF solid;
+}
+
+.header-button {
+    border: 0;
+    background: #FFF;
+    width: 120px;
+    height: 40px;
+    margin: 10px 20px;
+    font-size: 14pt;
+    cursor: pointer;
+}

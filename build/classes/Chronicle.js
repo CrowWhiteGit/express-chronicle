@@ -7,18 +7,25 @@ const express_1 = __importDefault(require("express"));
 const path_1 = __importDefault(require("path"));
 const Flash_1 = __importDefault(require("./Flash"));
 const HistoryQ_1 = __importDefault(require("./HistoryQ"));
-// import { PageList } from "../ui/pages";
 const constanst_1 = require("../constanst");
 class Chronicle {
     constructor(expressApp, config = {}) {
         this.middleware = (req, res, next) => {
             let excludeEp = this.config.endpoint || constanst_1.DEFAULT_ENDPOINT;
-            // console.log(req.path, excludeEp, req.path.indexOf(excludeEp))
             if (req.path.indexOf(excludeEp) !== -1) {
                 next();
                 return;
             }
-            req.flash = new Flash_1.default(this.historyQ);
+            const { defaultRuleset = constanst_1.DEFAULT_RULESET, rules = [] } = this.config;
+            let usingRuleset = Object.assign({}, defaultRuleset);
+            for (let rule of rules) {
+                let location = rule.location || '/';
+                if (req.path.indexOf(location) !== -1) {
+                    usingRuleset = Object.assign({}, rule);
+                    break;
+                }
+            }
+            req.flash = new Flash_1.default(this.historyQ, usingRuleset);
             req.flash.setReq('method', req.method);
             req.flash.setReq('url', req.path);
             req.flash.setReq('query', req.query || {});
@@ -52,16 +59,22 @@ class Chronicle {
             });
             next();
         };
-        this.getIndexPage = (req, res) => {
+        this.getHistory = (req, res) => {
             const { limit, offset } = req.query;
             let history = this.historyQ.get(limit, offset);
             res.json(history);
         };
+        this.getImportant = (req, res) => {
+            const { limit, offset } = req.query;
+            let history = this.historyQ.getImportant(limit, offset);
+            res.json(history);
+        };
         this.config = config;
-        this.historyQ = new HistoryQ_1.default(this.config.capacity || constanst_1.DEFAULT_CAPACITY);
+        this.historyQ = new HistoryQ_1.default(this.config.capacity || constanst_1.DEFAULT_CAPACITY, this.config.importantCapacity || constanst_1.DEFAULT_IMPORTANT_CAPACITY);
         expressApp.use(this.middleware);
         expressApp.use(config.endpoint || constanst_1.DEFAULT_ENDPOINT, express_1.default.static(path_1.default.join(__dirname, '..', 'ui')));
-        expressApp.get(`${config.endpoint || constanst_1.DEFAULT_ENDPOINT}/api/history`, this.getIndexPage);
+        expressApp.get(`${config.endpoint || constanst_1.DEFAULT_ENDPOINT}/api/history`, this.getHistory);
+        expressApp.get(`${config.endpoint || constanst_1.DEFAULT_ENDPOINT}/api/important`, this.getImportant);
     }
 }
 exports.default = Chronicle;

@@ -1,16 +1,19 @@
 
 import HistoryQ from "./HistoryQ";
 import IHistoryItem from "../structs/IHistoryItem";
+import IRuleset from "../structs/IRuleset";
 
 export default class Flash {
     private request = {};
     private response = {};
     private startTime: number;
     private chronicle: HistoryQ;
+    private ruleset: IRuleset;
 
-    constructor(chronicle: HistoryQ) {
+    constructor(chronicle: HistoryQ, ruleset: IRuleset) {
         this.startTime = ms();
         this.chronicle = chronicle;
+        this.ruleset = ruleset;
     }
 
     setReq = (field: string, value: any) => {
@@ -35,8 +38,32 @@ export default class Flash {
     }
 
     done = () => {
+        let _behavior = this.ruleset.defaultBehavior;
+        let _status = (this.response as any)?.status?.code || null;
+        let _exceptions = this.ruleset.exceptions || [];
+        for (let rule of _exceptions) {
+            if (rule.statusCode === Number(_status)) _behavior = rule.behavior;
+        }
+
         let result = this.process();
-        if (!!result) this.chronicle.write(result);
+        if (!!!result) return;
+
+        switch(_behavior) {
+            case "important": {
+                this.chronicle.writeImportant(result);
+                break;
+            }
+            case "common": {
+                this.chronicle.write(result);
+                break;
+            }
+            case "ignore": {
+                break;
+            }
+            default: {
+                break;
+            }
+        }
     }
 }
 
