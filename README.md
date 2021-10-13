@@ -21,5 +21,4 @@ app.listen(3000);
 2) Open ```/chronicle``` in browser
 
 # TODO
-1) Configuration
-2) Request details
+1) Request logging rules
