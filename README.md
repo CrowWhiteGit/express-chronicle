@@ -13,7 +13,7 @@ Example:
 const express = require('express');
 const app = express();
 
-const { Chronicle, IConfig } = require('../../build');
+const { Chronicle, IConfig } = require('express-chronicle');
 
 /**
  * @type {IConfig}
