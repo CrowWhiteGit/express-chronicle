@@ -13,8 +13,7 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "react-scripts build",
-    "build2": "PUBLIC_URL=/chronicle react-scripts build && rm -rf ../build/ui && cp -r ./build ../build/ui",
+    "build": "PUBLIC_URL=./ react-scripts build && rm -rf ../build/ui && cp -r ./build ../build/ui",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },

@@ -7,10 +7,8 @@ import "./History.css"
 
 async function getHistory() {
     let currentUrl = document.location.href;
-    console.log('currentUrl', currentUrl)
 
     let res = await fetch(`${currentUrl}api/history`);
-    // let res = await fetch(`http://localhost:3001/chronicle/api/history`);
     let data = await res.json()
     return data;
 }

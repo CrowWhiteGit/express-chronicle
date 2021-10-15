@@ -8,9 +8,10 @@ const { Chronicle, IConfig } = require('../../build');
  * @type {IConfig}
  */
 const config = {
+    endpoint: "/chr",
     capacity: 10,
     importantCapacity: 50,
-    defaultRuleset: { 
+    defaultRuleset: {
         defaultBehavior: "ignore"
     },
     rules: [
@@ -40,22 +41,8 @@ app.post('/test', (req, res) => {
     }
 
     res.json({
-        foo: "bar",
-        foo1: "bar",
-        foo2: "bar",
-        foo3: "bar",
-        foo4: "bar",
-        foo1: "bar",
-        foo11: "bar",
-        foo21: "bar",
-        foo31: "bar",
-        foo41: "bar",
-        foo2: "bar",
-        foo12: "bar",
-        foo22: "bar",
-        foo32: "bar",
-        foo42: "bar",
+        foo: "bar"
     });
 });
 
-app.listen(3001)
+app.listen(3000)
