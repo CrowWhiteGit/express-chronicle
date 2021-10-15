@@ -64,6 +64,7 @@ app.listen(3000)
 Configuration interface:
 | Field | Description |
 | --- | --- |
+| endpoint | type: String. Location of UI (default /chronicle) |
 | capacity | type: Number. Number of requests stored in common queue (default 100) |
 | importantCapacity | type: Number. Number of requests stored in important queue (default 200) |
 | defaultRuleset | type: IRuleset. Change default configuration for all locations. (default behavior 'common') |
